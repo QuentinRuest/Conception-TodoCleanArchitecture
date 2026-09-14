@@ -1,0 +1,79 @@
+name: Deploy Backend to VPS
+
+on:
+  push:
+    branches: [student]
+    paths:
+      - "CleanTodo.WebAPI/**"
+      - "CleanTodo.Application/**"
+      - "CleanTodo.Domain/**"
+      - "CleanTodo.Infrastructure/**"
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: "10.0.x"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Create appsettings.Production.json
+        run: |
+          cat > CleanTodo.WebAPI/appsettings.Production.json << EOF
+          {
+            "ConnectionStrings": {
+              "DefaultConnection": "${{ secrets.DB_CONNECTION_STRING }}"
+            },
+            "Logging": {
+              "LogLevel": {
+                "Default": "Information",
+                "Microsoft.AspNetCore": "Warning"
+              }
+            },
+            "AllowedHosts": "*"
+          }
+          EOF
+
+      - name: Publish in Release mode
+        run: dotnet publish CleanTodo.WebAPI/CleanTodo.API.csproj -c Release -o ./publish
+
+      - name: Stop API
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            systemctl stop cleantodo
+
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "publish/*"
+          target: "/var/www/cleantodo-publish/"
+          strip_components: 1
+          overwrite: true
+
+      - name: Restart API
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            systemctl start cleantodo
+            systemctl status cleantodo --no-pager
