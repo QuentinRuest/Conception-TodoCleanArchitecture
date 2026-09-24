@@ -1,11 +1,18 @@
 using CleanTodo.Application.UseCase;
 using CleanTodo.Domain.DTOS;
 using CleanTodo.Domain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TodoController(GetAllTodosUseCase getAllUseCase, GetTodoUseCase getTodoUseCase, CreateTodoUseCase createTodoDto) : ControllerBase
+public class TodoController(
+    GetAllTodosUseCase getAllUseCase,
+    GetTodoUseCase getTodoUseCase,
+    CreateTodoUseCase createTodoDto,
+    UpdateTodoUseCase updateTodoUseCase,
+    DeleteTodoUseCase deleteTodoUseCase
+) : ControllerBase
 {
     private CreateTodoUseCase _createTodoUseCase = createTodoDto;
 
@@ -16,8 +23,7 @@ public class TodoController(GetAllTodosUseCase getAllUseCase, GetTodoUseCase get
         return Ok(todos);
     }
 
-    //Cadeau! pour le create. On utilise un CreatedAtAction qui retourne un code http 201 et un header location avec l'url du nouvel élément créé.
-
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<TodoDto>> Create([FromBody] CreateTodoDto createTodoDto)
     {
@@ -29,7 +35,7 @@ public class TodoController(GetAllTodosUseCase getAllUseCase, GetTodoUseCase get
             todo);
     }
 
-    [HttpGet("{id}")] // /api/todo/ton_id
+    [HttpGet("{id}")]
     public async Task<IActionResult> Get(Guid id)
     {
         try
@@ -43,6 +49,35 @@ public class TodoController(GetAllTodosUseCase getAllUseCase, GetTodoUseCase get
         }
     }
 
-    // Pour le delete et le update, tu peux retourn un noContent (http 204) qui dit :"Ça fonctionné, je n'ai rien à te retourner"
-    //return NoContent();
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] TodoUpdateDto dto)
+    {
+        if (id != dto.Id) return BadRequest();
+
+        try
+        {
+            await updateTodoUseCase.Execute(id, dto);
+            return NoContent();
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            await deleteTodoUseCase.Execute(id);
+            return NoContent();
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
 }

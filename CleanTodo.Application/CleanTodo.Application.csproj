@@ -7,14 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.19" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.19" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.23.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CleanTodo.Domain\CleanTodo.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UseCases\Auth\" />
   </ItemGroup>
 
 </Project>

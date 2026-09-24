@@ -13,15 +13,17 @@ public static class DependencyInjection
     {
         // Register DbContext
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+
         services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(
                 connectionString,
                 ServerVersion.AutoDetect(connectionString),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
-        ));
+            ));
 
         // Register Repositories
         services.AddScoped<ITodoRepository, TodoRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }

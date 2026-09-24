@@ -30,4 +30,19 @@ public class TodoRepository : ITodoRepository
             .Where(x => x.Id == id)
             .SingleOrDefaultAsync();
     }
+
+    public async Task<Todo> Update(Todo todo)
+    {
+        _context.Todos.Update(todo);
+        await _context.SaveChangesAsync();
+        return todo;
+    }
+
+    public async Task Delete(Guid id)
+    {
+        var todo = await FindById(id);
+        if (todo == null) return;
+        _context.Todos.Remove(todo);
+        await _context.SaveChangesAsync();
+    }
 }
