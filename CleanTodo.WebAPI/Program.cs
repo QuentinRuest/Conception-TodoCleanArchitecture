@@ -1,4 +1,5 @@
 // Program.cs
+
 using CleanTodo.Application;
 using CleanTodo.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,91 +14,115 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container
+
         builder.Services.AddControllers();
 
-        // Add Application Layer
         builder.Services.AddApplication();
-
-        // Add Infrastructure Layer
         builder.Services.AddInfrastructure(builder.Configuration);
 
-        // Add Swagger/OpenAPI
         builder.Services.AddEndpointsApiExplorer();
+
         builder.Services.AddSwaggerGen(options =>
         {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT",
-                In = ParameterLocation.Header
-            });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
+            options.AddSecurityDefinition(
+                "Bearer",
+                new OpenApiSecurityScheme
                 {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    Array.Empty<string>()
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header
                 }
-            });
-        });
+            );
 
-        // JWT Authentication
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme =
-                JwtBearerDefaults.AuthenticationScheme;
-
-            options.DefaultChallengeScheme =
-                JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters =
-                new TokenValidationParameters
+            options.AddSecurityRequirement(
+                new OpenApiSecurityRequirement
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-
-                    ValidIssuer = "your-app",
-                    ValidAudience = "your-app",
-
-                    IssuerSigningKey =
-                        new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes("tgfrghjkiuytrgyhujiuytgryhujikuytryui")
-                        )
-                };
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                }
+            );
         });
+
+        var jwtSettings =
+            builder.Configuration.GetSection("JwtSettings");
+
+        var jwtKey =
+            jwtSettings["Key"]
+            ?? throw new InvalidOperationException(
+                "JwtSettings:Key is missing"
+            );
+
+        var jwtIssuer =
+            jwtSettings["Issuer"]
+            ?? throw new InvalidOperationException(
+                "JwtSettings:Issuer is missing"
+            );
+
+        var jwtAudience =
+            jwtSettings["Audience"]
+            ?? throw new InvalidOperationException(
+                "JwtSettings:Audience is missing"
+            );
+
+        builder.Services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme =
+                    JwtBearerDefaults.AuthenticationScheme;
+
+                options.DefaultChallengeScheme =
+                    JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters =
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = jwtIssuer,
+                        ValidAudience = jwtAudience,
+
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(jwtKey)
+                            )
+                    };
+            });
+
+        builder.Services.AddAuthorization();
 
         var app = builder.Build();
 
-        // Apply database migrations
         using (var scope = app.Services.CreateScope())
         {
             var dbContext =
-                scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                scope.ServiceProvider
+                    .GetRequiredService<AppDbContext>();
 
             dbContext.Database.Migrate();
         }
 
-        // Swagger
+
         app.UseSwagger();
         app.UseSwaggerUI();
 
         app.UseHttpsRedirection();
 
-        // Authentication MUST be before Authorization
         app.UseAuthentication();
         app.UseAuthorization();
 
