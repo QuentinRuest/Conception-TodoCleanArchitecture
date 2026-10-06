@@ -10,7 +10,7 @@ public class PingController(
 ) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> Ping()
+    public async Task<IActionResult> ping()
     {
         return Ok("pong");
     }
