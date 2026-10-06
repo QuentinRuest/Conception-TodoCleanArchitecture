@@ -106,17 +106,19 @@ public class Program
 
         builder.Services.AddAuthorization();
 
-        builder.Services.AddCors(options => {
-            options.AddPolicy("AllowAll", policy => {
-                                policy.AllowAnyOrigin()
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
 
-                .AllowAnyMethod()
+.AllowAnyMethod()
 
-                .AllowAnyHeader();
+.AllowAnyHeader();
 
-                            });
+            });
 
-                        });
+        });
 
         var app = builder.Build();
 

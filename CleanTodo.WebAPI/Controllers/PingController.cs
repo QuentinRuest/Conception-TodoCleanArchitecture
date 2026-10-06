@@ -6,11 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ShipController(
+public class PingController(
 ) : ControllerBase
 {
     [HttpGet]
-    [Route("ping")]
     public async Task<IActionResult> Ping()
     {
         return Ok("pong");
