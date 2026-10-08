@@ -1,10 +1,9 @@
-using System;
 
 namespace CleanTodo.Domain.DTOS;
 
 public class TodoUpdateDto
 {
     public Guid Id { get; set; }
-    public string? Title { get; set; }
+    public string Title { get; set; }
     public bool IsCompleted { get; set; }
 }

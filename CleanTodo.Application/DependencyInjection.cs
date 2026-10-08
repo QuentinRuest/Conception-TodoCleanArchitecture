@@ -17,7 +17,7 @@ public static class DependencyInjection
         // Todo UseCases
         services.AddScoped<CreateTodoUseCase>();
         services.AddScoped<DeleteTodoUseCase>();
-        services.AddScoped<GetTodoUseCase>();
+        services.AddScoped<GetShipUseCase>();
         services.AddScoped<GetAllTodosUseCase>();
         services.AddScoped<UpdateTodoUseCase>();
         //services.AddScoped<ToggleTodoCompleteStatusUseCase>();
@@ -27,6 +27,9 @@ public static class DependencyInjection
         services.AddScoped<RegisterUseCase>();
 
         services.AddScoped<JwtService>();
+
+        //Ship UseCases
+        services.AddScoped<GetShipUseCase>();
 
         return services;
     }

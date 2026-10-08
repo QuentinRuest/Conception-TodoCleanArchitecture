@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class TodoController(
     GetAllTodosUseCase getAllUseCase,
-    GetTodoUseCase getTodoUseCase,
+    GetShipUseCase getTodoUseCase,
     CreateTodoUseCase createTodoDto,
     UpdateTodoUseCase updateTodoUseCase,
     DeleteTodoUseCase deleteTodoUseCase
