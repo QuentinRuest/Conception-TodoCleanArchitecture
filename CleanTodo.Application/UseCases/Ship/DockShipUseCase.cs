@@ -28,7 +28,7 @@ public class DockShipUseCase
             shipDto.name,
             shipDto.goldCargo,
             shipDto.captain,
-            shipDto.status,
+            "Docked",
             shipDto.crewSize,
             shipDto.createdBy,
             shipDto.createdAt,
