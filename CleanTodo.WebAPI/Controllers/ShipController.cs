@@ -25,8 +25,6 @@ public class ShipController(
     private GetAllShipsUseCase _getAllShipsUseCase = getAllShipsUseCase;
     private DeleteShipUseCase _deleteShipUseCase = deleteShipUseCase;
     private UpdateShipUseCase _updateShipUseCase = updateShipUseCase;
-    private readonly IShipRepository _shipRepository;
-    private readonly IPirateBrokerGateway _pirateBrokerGateway;
 
     [Authorize]
     [HttpGet("{id}")]
@@ -104,25 +102,15 @@ public class ShipController(
         });
     }
     [HttpPost("sail")]
-    public async Task Execute(Guid id, string destination)
+    public async Task<IActionResult> Sail(Guid id, string destination)
     {
-        var ship = await _shipRepository.FindById(id);
+        await sailShipUseCase.Execute(id, destination);
 
-        if (ship == null)
+        return Ok(new
         {
-            throw new CleanTodo.Domain.Exceptions.NotFoundException(id);
-        }
-
-        var ports = await _pirateBrokerGateway.GetAllPorts();
-
-        if (!ports.Contains(destination))
-        {
-            throw new InvalidOperationException(
-                "Le port de destination n'existe pas."
-            );
-        }
-
-        await _pirateBrokerGateway.Sail(ship, destination);
+            success = true,
+            message = "L'envoi du bateau a réussi."
+        });
     }
     [HttpGet]
     public async Task<IActionResult> GetAllShips()

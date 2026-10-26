@@ -17,13 +17,19 @@ public class SailShipUseCase
         _shipRepository = shipRepository;
         _pirateBrokerGateway = pirateBrokerGateway;
     }
-    public async Task Execute(Ship ship, string destination)
+    public async Task Execute(Guid id, string destination)
     {
+        var ship = await _shipRepository.FindById(id);
+
         var ports = await _pirateBrokerGateway.GetAllPorts();
+
         if (!ports.Contains(destination))
         {
-            throw new InvalidOperationException("Le port de destination n'existe pas.");
+            throw new InvalidOperationException(
+                "Le port de destination n'existe pas."
+            );
         }
+
         await _pirateBrokerGateway.Sail(ship, destination);
     }
 }
