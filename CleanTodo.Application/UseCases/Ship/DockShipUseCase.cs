@@ -13,7 +13,7 @@ public class DockShipUseCase
         _shipRepository = shipRepository;
     }
 
-    public async Task<ShipDto> Execute(CreateShipDto shipDto)
+    public async Task<ShipDto> Execute(BrokerShipDto shipDto)
     {
         var ships = await _shipRepository.GetAll();
 
@@ -25,17 +25,12 @@ public class DockShipUseCase
         }
 
         Ship ship = new Ship(
-            shipDto.name,
-            shipDto.goldCargo,
-            shipDto.captain,
-            "docked",
-            shipDto.crewSize,
+            shipDto.Name,
+            shipDto.GoldCargo,
+            shipDto.Captain,
+            shipDto.CrewSize,
             shipDto.createdBy
-        )
-        {
-            createdAt = shipDto.createdAt,
-            lastModified = DateTime.UtcNow
-        };
+        );
 
         Ship savedShip = await _shipRepository.Add(ship);
 

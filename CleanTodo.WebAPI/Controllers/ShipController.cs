@@ -86,7 +86,7 @@ public class ShipController(
         return Ok(ports);
     }
     [HttpPost("dock")]
-    public async Task<IActionResult> Dock([FromBody] CreateShipDto dto)
+    public async Task<IActionResult> Dock([FromBody] BrokerShipDto dto)
     {
         var ship = await dockShipUseCase.Execute(dto);
 
