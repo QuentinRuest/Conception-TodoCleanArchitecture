@@ -30,6 +30,12 @@ public static class DependencyInjection
 
         //Ship UseCases
         services.AddScoped<GetShipUseCase>();
+        services.AddScoped<CreateShipUseCase>();
+        services.AddScoped<UpdateShipUseCase>();
+        services.AddScoped<DeleteShipUseCase>();
+        services.AddScoped<GetAllShipsUseCase>();
+        services.AddScoped<GetAllPortsUseCase>();
+        services.AddScoped<DockShipUseCase>();
 
         return services;
     }

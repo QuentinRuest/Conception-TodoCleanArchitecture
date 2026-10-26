@@ -1,4 +1,6 @@
-﻿using CleanTodo.Domain.Interfaces.Repositories;
+﻿using CleanTodo.Domain.Interfaces.Gateway;
+using CleanTodo.Domain.Interfaces.Repositories;
+using CleanTodo.Infrastructure.Gateway;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +27,9 @@ public static class DependencyInjection
         services.AddScoped<ITodoRepository, TodoRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IShipRepository, ShipRepository>();
+
+        //Gateway
+        services.AddScoped<IPirateBrokerGateway, PirateBrokerGateway>();
 
         return services;
     }

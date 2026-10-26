@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using CleanTodo.Domain.Interfaces.Gateway;
+using CleanTodo.Infrastructure.Gateway;
+using System.Net.Http.Headers;
 
 public class Program
 {
@@ -118,6 +121,28 @@ public class Program
 
             });
 
+        });
+        builder.Services.AddHttpClient<IPirateBrokerGateway, PirateBrokerGateway>(client =>
+        {
+            var baseUrl = builder.Configuration["PirateBroker:BaseUrl"]
+                ?? throw new InvalidOperationException("BaseUrl manquant.");
+
+            var clientId = builder.Configuration["PirateBroker:ClientId"]
+                ?? throw new InvalidOperationException("ClientId manquant.");
+
+            var appToken = builder.Configuration["PirateBroker:AppToken"]
+                ?? throw new InvalidOperationException("AppToken manquant.");
+
+            client.BaseAddress = new Uri(baseUrl);
+
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json")
+            );
+
+            client.DefaultRequestHeaders.Add("x-client-id", clientId);
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", appToken);
         });
 
         var app = builder.Build();

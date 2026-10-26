@@ -21,6 +21,45 @@ namespace CleanTodo.Infrastructure.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("CleanTodo.Domain.Entities.Ship", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("captain")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("createdAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("createdBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("crewSize")
+                        .HasColumnType("int");
+
+                    b.Property<int>("goldCargo")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("lastModified")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ships");
+                });
+
             modelBuilder.Entity("CleanTodo.Domain.Entities.Todo", b =>
                 {
                     b.Property<Guid>("Id")
