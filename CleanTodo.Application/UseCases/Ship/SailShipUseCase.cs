@@ -31,5 +31,6 @@ public class SailShipUseCase
         }
 
         await _pirateBrokerGateway.Sail(ship, destination);
+        await _shipRepository.Delete(id);
     }
 }
