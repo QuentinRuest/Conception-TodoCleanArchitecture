@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using CleanTodo.Domain.Entities;
 
 namespace CleanTodo.Infrastructure.Gateway
 {
@@ -25,6 +26,27 @@ namespace CleanTodo.Infrastructure.Gateway
 
             return json.GetProperty("users").Deserialize<List<string>>()
                 ?? new List<string>();
+        }
+        public async Task Sail(Ship ship, string destination)
+        {
+            var payload = new
+            {
+                name = ship.name,
+                goldCargo = ship.goldCargo,
+                createdAt = ship.createdAt,
+                captain = ship.captain,
+                status = "sailing",
+                crewSize = ship.crewSize,
+                createdBy = ship.createdBy,
+                lastModified = DateTime.UtcNow
+            };
+            var content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+            var response = await _httpClient.PostAsync("sail", content);
+            response.EnsureSuccessStatusCode();
         }
     }
 }

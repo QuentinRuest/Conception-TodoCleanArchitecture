@@ -25,11 +25,14 @@ public class DockShipUseCase
         }
 
         Ship ship = new Ship(
-            shipDto.Name,
-            shipDto.GoldCargo,
-            shipDto.Captain,
-            shipDto.CrewSize,
-            shipDto.createdBy
+            shipDto.name,
+            shipDto.goldCargo,
+            shipDto.captain,
+            shipDto.status,
+            shipDto.crewSize,
+            shipDto.createdBy,
+            shipDto.createdAt,
+            shipDto.lastModified
         );
 
         Ship savedShip = await _shipRepository.Add(ship);

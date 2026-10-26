@@ -6,10 +6,13 @@ namespace CleanTodo.Domain.DTOS
 {
     public class BrokerShipDto
     {
-        public string Name { get; set; }
-        public string Captain { get; set; }
-        public int GoldCargo { get; set; }
-        public int CrewSize { get; set; }
+        public string name { get; set; }
+        public int goldCargo { get; set; }
+        public DateTime createdAt { get; set; }
+        public string captain { get; set; }
+        public string status { get; set; }
+        public int crewSize { get; set; }
         public string createdBy { get; set; }
+        public DateTime lastModified { get; set; }
     }
 }

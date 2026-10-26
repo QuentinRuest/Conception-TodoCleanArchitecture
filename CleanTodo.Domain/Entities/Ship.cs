@@ -16,17 +16,17 @@ public class Ship
     /// Constructeur qui crée mon guid, date
     /// </summary>
     /// <param name="text">Le texte du todo.</param>
-    public Ship(string name, int goldCargo, string captain, int crewSize, string createdBy)
+    public Ship(string name, int goldCargo, string captain, string status, int crewSize, string createdBy, DateTime createdAt, DateTime lastModified)
     {
         Id = Guid.NewGuid();
         this.name = name;
         this.goldCargo = goldCargo;
-        createdAt = DateTime.Now;
+        createdAt = createdAt;
         this.captain = captain;
-        this.status = "docked";
+        this.status = status;
         this.crewSize = crewSize;
         this.createdBy = createdBy;
-        lastModified = DateTime.Now;
+        lastModified = lastModified;
     }
 
     public Ship() { }

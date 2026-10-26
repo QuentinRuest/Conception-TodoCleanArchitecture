@@ -1,6 +1,9 @@
 using CleanTodo.Application.UseCase;
 using CleanTodo.Domain.DTOS;
+using CleanTodo.Domain.Entities;
 using CleanTodo.Domain.Exceptions;
+using CleanTodo.Domain.Interfaces.Gateway;
+using CleanTodo.Domain.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +16,8 @@ public class ShipController(
     DeleteShipUseCase deleteShipUseCase,
     GetAllShipsUseCase getAllShipsUseCase,
     GetAllPortsUseCase getAllPortsUseCase,
-    DockShipUseCase dockShipUseCase
+    DockShipUseCase dockShipUseCase,
+    SailShipUseCase sailShipUseCase
 
 ) : ControllerBase
 {
@@ -21,6 +25,8 @@ public class ShipController(
     private GetAllShipsUseCase _getAllShipsUseCase = getAllShipsUseCase;
     private DeleteShipUseCase _deleteShipUseCase = deleteShipUseCase;
     private UpdateShipUseCase _updateShipUseCase = updateShipUseCase;
+    private readonly IShipRepository _shipRepository;
+    private readonly IPirateBrokerGateway _pirateBrokerGateway;
 
     [Authorize]
     [HttpGet("{id}")]
@@ -96,6 +102,33 @@ public class ShipController(
             message = "Le bateau est arrivé au port.",
             ship
         });
+    }
+    [HttpPost("sail")]
+    public async Task Execute(Guid id, string destination)
+    {
+        var ship = await _shipRepository.FindById(id);
+
+        if (ship == null)
+        {
+            throw new CleanTodo.Domain.Exceptions.NotFoundException(id);
+        }
+
+        var ports = await _pirateBrokerGateway.GetAllPorts();
+
+        if (!ports.Contains(destination))
+        {
+            throw new InvalidOperationException(
+                "Le port de destination n'existe pas."
+            );
+        }
+
+        await _pirateBrokerGateway.Sail(ship, destination);
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetAllShips()
+    {
+        var ships = await _getAllShipsUseCase.Execute();
+        return Ok(ships);
     }
 
 }
