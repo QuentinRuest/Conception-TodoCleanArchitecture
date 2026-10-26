@@ -27,7 +27,7 @@ public class ShipController(
     private UpdateShipUseCase _updateShipUseCase = updateShipUseCase;
 
     [Authorize]
-    [HttpGet("{id}")]
+    [HttpGet("get/{id}")]
     public async Task<IActionResult> Get(Guid id)
     {
         try
@@ -41,7 +41,7 @@ public class ShipController(
         }
     }
     [Authorize]
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<ActionResult<ShipDto>> Create([FromBody] CreateShipDto createShipDto)
     {
         try
@@ -55,7 +55,7 @@ public class ShipController(
         }
     }
     [Authorize]
-    [HttpPut("{id}")]
+    [HttpPut("modify/{id}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] ShipUpdateDto dto)
     {
         try
@@ -69,7 +69,7 @@ public class ShipController(
         }
     }
     [Authorize]
-    [HttpDelete("{id}")]
+    [HttpDelete("delete/{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         try
@@ -90,6 +90,7 @@ public class ShipController(
         return Ok(ports);
     }
     [HttpPost("dock")]
+    [Authorize]
     public async Task<IActionResult> Dock([FromBody] BrokerShipDto dto)
     {
         var ship = await dockShipUseCase.Execute(dto);
@@ -102,6 +103,7 @@ public class ShipController(
         });
     }
     [HttpPost("sail")]
+    [Authorize]
     public async Task<IActionResult> Sail(Guid id, string destination)
     {
         await sailShipUseCase.Execute(id, destination);
@@ -113,6 +115,7 @@ public class ShipController(
         });
     }
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAllShips()
     {
         var ships = await _getAllShipsUseCase.Execute();
