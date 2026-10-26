@@ -107,7 +107,11 @@ public class ShipController(
     {
         await sailShipUseCase.Execute(id, destination);
 
-        return Ok(
+        return Ok(new
+        {
+            success = true,
+            message = "Le bateau est en route vers le port de destination."
+        }
             );
     }
     [HttpGet]
