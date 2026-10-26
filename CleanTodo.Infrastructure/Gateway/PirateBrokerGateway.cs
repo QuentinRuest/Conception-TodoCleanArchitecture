@@ -32,20 +32,22 @@ namespace CleanTodo.Infrastructure.Gateway
             var payload = new
             {
                 name = ship.name,
-                goldCargo = ship.goldCargo,
-                createdAt = ship.createdAt,
                 captain = ship.captain,
-                status = "sailing",
+                goldCargo = ship.goldCargo,
                 crewSize = ship.crewSize,
                 createdBy = ship.createdBy,
-                lastModified = DateTime.UtcNow
+                createdAt = ship.createdAt,
+                lastModified = DateTime.UtcNow,
+                status = "sailing"
             };
-            var content = new StringContent(
-                JsonSerializer.Serialize(payload),
-                Encoding.UTF8,
-                "application/json"
+
+            var path = $"ship/sail/{Uri.EscapeDataString(destination)}";
+
+            var response = await _httpClient.PostAsJsonAsync(
+                path,
+                payload
             );
-            var response = await _httpClient.PostAsync("sail", content);
+
             response.EnsureSuccessStatusCode();
         }
     }
