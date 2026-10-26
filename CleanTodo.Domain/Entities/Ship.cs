@@ -21,12 +21,12 @@ public class Ship
         Id = Guid.NewGuid();
         this.name = name;
         this.goldCargo = goldCargo;
-        createdAt = createdAt;
+        this.createdAt = createdAt;
         this.captain = captain;
         this.status = status;
         this.crewSize = crewSize;
         this.createdBy = createdBy;
-        lastModified = lastModified;
+        this.lastModified = lastModified;
     }
 
     public Ship() { }
