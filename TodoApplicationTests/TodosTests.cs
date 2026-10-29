@@ -1,10 +1,9 @@
-using CleanTodo.Application.DTOS;
 using CleanTodo.Application.UseCase;
 using CleanTodo.Application.Validators;
+using CleanTodo.Domain.DTOS;
 using CleanTodo.Domain.Entities;
 using CleanTodo.Domain.Exceptions;
 using CleanTodo.Domain.Interfaces.Repositories;
-using CleanTodo.Domain.UseCase;
 using FluentValidation;
 using Moq;
 
@@ -17,7 +16,6 @@ public class TodosTests
     private GetTodoUseCase _getTodoUseCase;
     private DeleteTodoUseCase _deleteTodoUseCase;
     private GetAllTodosUseCase _getAllTodosUseCase;
-    private ToggleTodoCompleteStatusUseCase _toggleTodoCompleteStatusUseCase;
     private IValidator<CreateTodoDto> _createTodoValidator;
     Todo todo1 = new Todo { Id = Guid.NewGuid(), Text = "Test Todo 1" };
     Todo todo2 = new Todo { Id = Guid.NewGuid(), Text = "Test Todo 2" };
@@ -28,16 +26,14 @@ public class TodosTests
     {
         _createTodoValidator = new CreateTodoValidation();
         _todoRepositoryMock = new Mock<ITodoRepository>();
-        _createTodoUseCase = new CreateTodoUseCase(_todoRepositoryMock.Object, _createTodoValidator);
+        _createTodoUseCase = new CreateTodoUseCase(_todoRepositoryMock.Object); 
         _getTodoUseCase = new GetTodoUseCase(_todoRepositoryMock.Object);
         _deleteTodoUseCase = new DeleteTodoUseCase(_todoRepositoryMock.Object);
         _getAllTodosUseCase = new GetAllTodosUseCase(_todoRepositoryMock.Object);
-        _toggleTodoCompleteStatusUseCase = new ToggleTodoCompleteStatusUseCase(_todoRepositoryMock.Object);
 
         // Arrange
         _todoRepositoryMock.Setup(repo => repo.Add(It.IsAny<Todo>())).ReturnsAsync(todo1);
         _todoRepositoryMock.Setup(repo => repo.Delete(It.IsAny<Guid>()));
-        _todoRepositoryMock.Setup(repo => repo.ToggleCompleteStatus(It.IsAny<Guid>()));
         _todoRepositoryMock.Setup(repo => repo.GetAll()).ReturnsAsync(new List<Todo> { todo1, todo2 });
         _todoRepositoryMock.Setup(repo => repo.FindById(It.Is<Guid>(id => id == todo1.Id))).ReturnsAsync(todo1);
     }
@@ -91,23 +87,17 @@ public class TodosTests
     }
 
     [Test]
-    public async Task ToggleTodoCompleteStatus_ShouldCallRepositoryToggleCompleteStatus()
+    public void DeleteMissingTodo_ShouldThrowAnError()
     {
-        // Act
-        await _toggleTodoCompleteStatusUseCase.Execute(todo1.Id);
+        var id = Guid.NewGuid();
 
-        // Assert
-        _todoRepositoryMock.Verify(repo => repo.ToggleCompleteStatus(todo1.Id), Times.Once);
-    }
+        Assert.ThrowsAsync<NotFoundException>(
+            async () => await _deleteTodoUseCase.Execute(id)
+        );
 
-    [Test]
-    public async Task DelitingAMissingTodo_ShouldThrowAnError()
-    {
-        Guid idOfAFakeTodo = Guid.NewGuid();
-        // Act
-
-        // Assert
-        Assert.ThrowsAsync<NotFoundException>(async () => await _toggleTodoCompleteStatusUseCase.Execute(idOfAFakeTodo));
-        _todoRepositoryMock.Verify(repo => repo.FindById(idOfAFakeTodo), Times.Once);
+        _todoRepositoryMock.Verify(
+            repo => repo.Delete(It.IsAny<Guid>()),
+            Times.Never
+        );
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using CleanTodo.Domain.DTOS;
 using CleanTodo.Domain.Entities;
 
 namespace CleanTodo.Domain.Interfaces.Gateway
@@ -9,6 +10,6 @@ namespace CleanTodo.Domain.Interfaces.Gateway
     {
         Task<List<string>> GetAllPorts();
 
-        Task Sail(Ship ship, string destination);
+        Task Sail(BrokerShipDto ship, string destination);
     }
 }

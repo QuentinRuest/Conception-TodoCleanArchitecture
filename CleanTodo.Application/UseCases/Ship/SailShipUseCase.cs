@@ -1,4 +1,5 @@
-﻿using CleanTodo.Domain.Entities;
+﻿using CleanTodo.Domain.DTOS;
+using CleanTodo.Domain.Entities;
 using CleanTodo.Domain.Interfaces.Gateway;
 using CleanTodo.Domain.Interfaces.Repositories;
 using System;
@@ -19,7 +20,19 @@ public class SailShipUseCase
     }
     public async Task Execute(Guid id, string destination)
     {
-        var ship = await _shipRepository.FindById(id);
+        Ship ship = await _shipRepository.FindById(id);
+
+        BrokerShipDto brokerShip = new BrokerShipDto
+        {
+            name = ship.name,
+            captain = ship.captain,
+            goldCargo = ship.goldCargo,
+            crewSize = ship.crewSize,
+            createdBy = ship.createdBy,
+            createdAt = ship.createdAt,
+            lastModified = DateTime.UtcNow,
+            status = "sailing"
+        };
 
         var ports = await _pirateBrokerGateway.GetAllPorts();
 
@@ -30,7 +43,7 @@ public class SailShipUseCase
             );
         }
 
-        await _pirateBrokerGateway.Sail(ship, destination);
+        await _pirateBrokerGateway.Sail(brokerShip, destination);
         await _shipRepository.Delete(id);
     }
 }

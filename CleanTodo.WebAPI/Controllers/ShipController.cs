@@ -40,6 +40,13 @@ public class ShipController(
             return NotFound();
         }
     }
+    [HttpGet("getAll")]
+    [Authorize]
+    public async Task<IActionResult> GetAllShips()
+    {
+        var ships = await _getAllShipsUseCase.Execute();
+        return Ok(ships);
+    }
     [Authorize]
     [HttpPost("create")]
     public async Task<ActionResult<ShipDto>> Create([FromBody] CreateShipDto createShipDto)
@@ -101,25 +108,23 @@ public class ShipController(
             ship
         });
     }
-    [HttpPost("sail")]
+    [HttpPost("{id}/sail/{destination}")]
     [Authorize]
     public async Task<IActionResult> Sail(Guid id, string destination)
     {
-        await sailShipUseCase.Execute(id, destination);
-
-        return Ok(new
+        try
         {
-            success = true,
-            message = "Le bateau est en route vers le port de destination."
+            await sailShipUseCase.Execute(id, destination);
+            return Ok();
         }
-            );
-    }
-    [HttpGet]
-    [Authorize]
-    public async Task<IActionResult> GetAllShips()
-    {
-        var ships = await _getAllShipsUseCase.Execute();
-        return Ok(ships);
+        catch (HttpRequestException ex)
+        {
+            return StatusCode(500,new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
     }
 
 }

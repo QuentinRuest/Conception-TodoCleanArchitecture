@@ -1,10 +1,12 @@
-﻿using CleanTodo.Domain.Interfaces.Gateway;
+﻿using Azure;
+using CleanTodo.Domain.DTOS;
+using CleanTodo.Domain.Entities;
+using CleanTodo.Domain.Interfaces.Gateway;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using CleanTodo.Domain.Entities;
 
 namespace CleanTodo.Infrastructure.Gateway
 {
@@ -27,28 +29,23 @@ namespace CleanTodo.Infrastructure.Gateway
             return json.GetProperty("users").Deserialize<List<string>>()
                 ?? new List<string>();
         }
-        public async Task Sail(Ship ship, string destination)
+        public async Task Sail(BrokerShipDto ship, string destination)
         {
-            var payload = new
-            {
-                name = ship.name,
-                captain = ship.captain,
-                goldCargo = ship.goldCargo,
-                crewSize = ship.crewSize,
-                createdBy = ship.createdBy,
-                createdAt = ship.createdAt,
-                lastModified = DateTime.UtcNow,
-                status = "sailing"
-            };
-
-            var path = $"ship/sail/{Uri.EscapeDataString(destination)}";
 
             var response = await _httpClient.PostAsJsonAsync(
-                path,
-                payload
-            );
-
+                $"ship/sail/{destination}",
+                ship
+            ); 
             response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+            if (!json.GetProperty("success").GetBoolean())
+            {
+                throw new HttpRequestException(
+                    json.GetProperty("message").GetString()
+                );
+            }
         }
     }
 }
