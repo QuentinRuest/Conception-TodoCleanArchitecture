@@ -115,7 +115,11 @@ public class ShipController(
         try
         {
             await sailShipUseCase.Execute(id, destination);
-            return Ok();
+            return Ok(new
+            {
+                success = true,
+                message = "Le bateau a été envoyé au port de destination."
+            });
         }
         catch (HttpRequestException ex)
         {
